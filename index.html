@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!--Perwira Putra Aghni-->
+    <title>Latihan WebGIS</title>  <!-- judul pada head -->
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        html, body, #peta {
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+        }
+    </style>
+
+</head>
+
+<body>
+    
+
+    <!--
+    <!- - Membuat Tulisan dengan heading 1 - ->
+    <h1>Belajar membuat website</h1>
+
+    <!- - Membuat running text - ->
+    <marquee behavior="" direction="right"> Tulisan bergerak </marquee> 
+
+    <!- - Menambahkan gambar - ->
+    <img src="rog.jpg" alt="" width="50%" height="50%"> 
+
+    <!- - membuat link - ->
+    <p>klik<a href="https://leafletjs.com/"> link </a> disini </p> 
+    -->
+
+    <div style="background: white; letter-spacing: 0.5em; padding: 5px;">
+        <marquee direction="left" scrollamount="5" align="center">
+            Peta Lahan Baku Sawah Kabupaten Bantul </marquee>
+    </div> 
+
+    <div id="peta"></div>
+
+    <script>
+
+        //titik tengah kooordinat pada peta dan tingkat zoom
+        var mukapeta = L.map('peta').setView([-7.899768, 110.362970], 12);
+
+        /*
+        //geolocation
+        //https://leafletjs.com/examples/mobile/
+        //view-source:https://leafletjs.com/examples/mobile/example.html
+	    function onLocationFound(e) {
+		    var radius = e.accuracy / 2;
+
+	    	var locationMarker = L.marker(e.latlng).addTo(map)
+		    	.bindPopup('You are within ' + radius + ' meters from this point').openPopup();
+
+		    var locationCircle = L.circle(e.latlng, radius).addTo(mukapeta);
+	    }
+
+	    function onLocationError(e) {
+		    alert(e.message);
+    	}
+
+    	mukapeta.on('locationfound', onLocationFound);
+	    mukapeta.on('locationerror', onLocationError);
+
+	    mukapeta.locate({setView: true, maxZoom: 16});
+        
+        mukapeta.locate({setView: true, maxZoom: 16});
+        */
+
+
+        //list basemaps dan menampilkan basemap
+        //sumber : https://stackoverflow.com/questions/33343881/leaflet-in-google-maps
+        //googleStreets
+        var basemaps0 = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+            maxZoom: 20, 
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: 'Google Streets'
+        });
+
+        //googleHybrid
+        var basemaps1 = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: 'Google Hybrid'
+        });
+
+        //googleSat
+        var basemaps2 = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: 'Google Satellite'
+        });
+
+        //googleTerrain
+        var basemaps3 = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: 'Google Terrain'
+        });
+        basemaps2.addTo(mukapeta);
+
+        /* 
+        ----------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------
+        */
+
+
+
+        //Data Geojson
+
+        //Sungai
+        var sungai = L.geoJson(null, {
+            style: function (feature) {
+                return {
+                    fillColor: "#33e1ff",
+                    fillOpacity: 0.6,
+                    color: "blue",
+                    weight: 1,
+                    opacity: 0.8
+                }
+            }
+        });
+        $.getJSON("data/SUNGAI_DIY.geojson", function(data){
+            sungai.addData(data);      
+        });
+        mukapeta.addLayer(sungai);
+
+        /*
+        //Jalan
+        var jalan = L.geoJson(null, {
+            style: function (feature) {
+                return {
+                    color: "#ff0000",
+                    weight: 1,
+                    opacity: 0.8
+                }
+            }
+        });
+        $.getJSON("data/JALAN_DIY.geojson", function(data){
+            jalan.addData(data);      
+        });
+        mukapeta.addLayer(jalan);
+        */
+        
+
+
+        //Polygon data
+        //Lahan Baku Sawah
+        var lbs = L.geoJson(null, {
+            style: function (feature) {
+                return {
+                    fillColor: " #01f50a",
+                    fillOpacity: 0.4,
+                    color: " #055707 ",
+                    weight: 1,
+                    opacity: 0.8
+                }
+            }
+        });
+
+        $.getJSON("data/LBS2021_BANTUL_VERIFIKASI_ADMIN.geojson", function(data){
+            lbs.addData(data);      
+        });
+        mukapeta.addLayer(lbs);
+
+        /*
+        //LP2B
+        var lp2b = L.geoJson(null, {
+            style: function (feature) {
+                return {
+                    fillColor: " #01f50a",
+                    fillOpacity: 0.4,
+                    color: " #055707 ",
+                    weight: 1,
+                    opacity: 0.8
+                }
+            }
+        });
+
+        $.getJSON("data/LP2B2021_BANTUL.geojson", function(data){
+            lp2b.addData(data);      
+        });
+        mukapeta.addLayer(lp2b);
+        */
+
+
+        //Batas adnin kelurahan
+        //var adminbantulkel = L.geoJson();        
+        var adminbantulkel = L.geoJson(null, {
+            style: function (feature) {
+                return {
+                    fillOpacity: 0,
+                    color: "white",
+                    weight: 0.5,
+                    opacity: 0.8
+                }
+            }
+        });
+        $.getJSON("data/ADMIN_BAPPEDABANTULKSP_KALURAHAN.geojson", function(data){
+            adminbantulkel.addData(data);      
+        });
+        mukapeta.addLayer(adminbantulkel);
+
+        //Batas adnin kecamatan
+        //var adminbantulkec = L.geoJson();
+        var adminbantulkec = L.geoJson(null, {
+            style: function (feature) {
+                return {
+                    fillOpacity: 0,
+                    color: "white",
+                    weight: 1.5,
+                    opacity: 0.8
+                }
+            }
+        });
+        $.getJSON("data/ADMIN_BAPPEDABANTULKSP_KAPANEWON.geojson", function(data){
+            adminbantulkec.addData(data);      
+        });
+        mukapeta.addLayer(adminbantulkec);
+        
+        
+        //data titik
+        //https://leafletjs.com/examples/custom-icons/
+        var titikkec = L.geoJson();
+        /*var titikkec = L.geoJson(null, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.icon({
+                        iconUrl: "icon/iconpoint2.png",
+                        iconSize: [30]   
+                    })
+                })
+            }
+        });*/
+        $.getJSON("data/TITIK_KANTORKEC.geojson", function(data){
+            titikkec.addData(data);      
+        });
+        mukapeta.addLayer(titikkec);
+        
+
+
+        /* 
+        ----------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------
+        */
+
+
+
+        //Layer Control
+        //https://leafletjs.com/examples/layers-control/
+        var basemaps = {
+            "Google Streets": basemaps0,
+            "Google Hybrid": basemaps1,
+            "Google Satellite": basemaps2,
+            "Google Terrain": basemaps3
+        };
+
+        var datalayer = {
+            "Batas Administrasi Kapanewon": adminbantulkec,
+            "Batas Administrasi Kalurahan": adminbantulkel,
+            "Sungai": sungai,
+            "Ibukota Kecamatan": titikkec,
+            //"Jalan": jalan,
+            "LBS lahan Baku Sawah": lbs
+            //"LP2B lahan Pertanian Pangan Berkelanjutan": lp2b
+        };
+
+        //L.control.layers(basemaps, baselayer, datalayer).addTo(mukapeta);
+        var layerscontrol =L.control.layers(basemaps,  datalayer, {collapsed:false});
+        layerscontrol.addTo(mukapeta);
+
+
+
+        //https://leafletjs.com/examples/extending/extending-3-controls.html
+        //https://leafletjs.com/examples/extending/watermark.html
+        L.Control.Watermark = L.Control.extend({
+		onAdd: function (mukapeta) {
+			var img = L.DomUtil.create('img');
+			img.src = 'logo/logo-bantul-medium.png';
+			img.style.width = '80px';
+			return img;
+		},
+        
+		onRemove: function (mukapeta) {
+			// Nothing to do here
+		}
+	    });
+        
+	    L.control.watermark = function (opts) {
+		return new L.Control.Watermark(opts);
+	    };
+	
+	    var watermarkControl = L.control.watermark({position: 'bottomleft'}).addTo(mukapeta);
+
+
+    </script>
+    
+
+</body>
+</html>
